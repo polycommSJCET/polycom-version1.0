@@ -12,6 +12,7 @@ import {
   useCall
 } from '@stream-io/video-react-sdk';
 import { useRouter, useSearchParams } from 'next/navigation';
+
 import { Users, LayoutList } from 'lucide-react';
 
 import {
@@ -26,12 +27,13 @@ import EndCallButton from './EndCallButton';
 import { cn } from '@/lib/utils';
 
 import { Button } from './ui/button';
-
+import { useUser } from "@clerk/nextjs";
 import { translateText } from './translateText';
 
 type CallLayoutType = 'grid' | 'speaker-left' | 'speaker-right';
 
 const MeetingRoom = () => {
+  const { isSignedIn, user } = useUser();
   const [listening, setListening] = useState(false);
   const [error, setError] = useState('');
   const [transError, setTransError] = useState('');
@@ -42,8 +44,15 @@ const MeetingRoom = () => {
   const [showParticipants, setShowParticipants] = useState(false);
   const { useCallCallingState } = useCallStateHooks();
   const callForAudio = useCall();
+  console.log(callForAudio)
   const translatedTextRef = useRef<HTMLParagraphElement>(null);
   const transcriptElementRef = useRef<HTMLParagraphElement>(null);
+
+  if (user) {
+    console.log("hey user")
+    console.log(user.fullName)
+  }
+  
 
   const sendtranscribe = async (transcription: any) => {
     console.log("sending", transcription);
@@ -56,7 +65,7 @@ const MeetingRoom = () => {
   };
 
   const handleTranslate = async (transcripts: string) => {
-    const response = await translateText(transcripts, transcriptionLanguage);
+    const response = await translateText(transcripts,user?.fullName,transcriptionLanguage,callForAudio?.id);
     if (response.error) {
       setTransError(response.error);
       if (translatedTextRef.current) {

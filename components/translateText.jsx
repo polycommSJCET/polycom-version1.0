@@ -1,6 +1,6 @@
 // utils/translateAPI.js
 
-export const translateText = async (text, language) => {
+export const translateText = async (text,username, language,meetingid) => {
     try {
       const response = await fetch('http://127.0.0.1:5000/translate', {
         method: 'POST',
@@ -9,7 +9,9 @@ export const translateText = async (text, language) => {
         },
         body: JSON.stringify({
           text: text,
+          speaker:username,
           language: language,
+          meeting_id:meetingid,
         }),
       });
   
