@@ -1,0 +1,72 @@
+/* Sidebar Styling */
+.sidebar {
+  position: fixed;
+  right: 0;
+  top: 0;
+  height: 100vh;
+  width: 250px;
+  background: linear-gradient(135deg, #1f2937, #3c4454);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  box-shadow: -3px 0 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+/* Sidebar Title */
+.sidebar .title {
+  font-size: 1.4rem;
+  text-align: center;
+  margin-bottom: 20px;
+  font-weight: bold;
+}
+
+/* User List */
+.userList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.userItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 6px;
+  margin: 5px 0;
+  cursor: pointer;
+  transition: background 0.3s ease-in-out;
+}
+
+.userItem:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.userName {
+  font-weight: 500;
+}
+
+.userStatus {
+  font-size: 0.85rem;
+  border-radius: 4px;
+  padding: 2px 6px;
+}
+
+.userStatus.Active {
+  background: #4caf50;
+  color: #fff;
+}
+
+.userStatus.Muted {
+  background: #f44336;
+  color: #fff;
+}
+
+.userStatus.Speaking {
+  background: #ff9800;
+  color: #fff;
+}

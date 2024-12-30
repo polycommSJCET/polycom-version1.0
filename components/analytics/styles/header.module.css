@@ -1,0 +1,23 @@
+.header {
+    background: linear-gradient(135deg, #0e0e10, #1e40af);
+    color: #fffcfc;
+    padding: 16px 24px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .header h1 {
+    font-size: 1.8rem;
+    font-weight: 600;
+    
+  }
+  
+  .header p {
+    font-size: 1rem;
+    opacity: 0.9;
+  }
+
