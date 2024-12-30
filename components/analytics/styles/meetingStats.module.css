@@ -1,0 +1,156 @@
+/* Layout */
+.layout {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  height: 70vh;
+  margin-bottom: 20px;
+
+
+}
+
+/* Main Content */
+.content {
+  flex: 3;
+  background: #f8fafc;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+
+}
+
+/* Sidebar */
+.sidebar {
+  flex: 1;
+  background-color: #1f2937; /* Dark Gray */
+  color: #ffffff;
+  border-radius: 8px;
+  padding: 20px;
+  overflow-y: auto;
+  
+  
+}
+
+/* Meeting Stats */
+.card {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  
+
+}
+
+.title {
+  font-size: 1.15rem; /* Decrease the font size */
+  margin-bottom: 10px;
+  color: #333;
+  text-align: center; /* Center the title */
+  font-weight: 600; /* Make the font weight bolder */
+  text-transform: uppercase; /* Make the text uppercase */
+  letter-spacing: 1px; /* Add some letter spacing */
+  position: relative; /* For adding a decorative element */
+  padding-bottom: 10px;
+  
+}
+
+/* Stats Container */
+.statsContainer {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* Three items per row */
+  gap: 20px; /* Space between grid items */
+  margin-top: 20px;
+  
+  
+}
+
+/* Optional: Ensure stat items adapt responsively */
+@media (max-width: 768px) {
+  .statsContainer {
+      grid-template-columns: repeat(2, 1fr); /* Two items per row on medium screens */
+  }
+}
+
+@media (max-width: 480px) {
+  .statsContainer {
+      grid-template-columns: 1fr; /* One item per row on small screens */
+  }
+}
+
+.statItem {
+  background: #f9fafb;
+  border-radius: 8px;
+  padding: 15px;
+  display: flex;
+  text-align: center;
+  gap: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  
+
+}
+
+.statItem:hover {
+  transform: translateY(-5px);
+}
+
+.icon {
+  font-size: 1.5rem;
+  margin-bottom: 5px;
+
+}
+
+.label {
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.value {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+/* Sidebar User List */
+.userList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  
+}
+
+.userItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  margin-bottom: 0.5rem;
+  background-color: #374151;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+  
+}
+
+.userItem:hover {
+  background-color: #4b5563;
+}
+
+.userName {
+  font-weight: 500;
+}
+
+.userStatus {
+  font-size: 0.9rem;
+  color: #9ca3af;
+}
+
+/* Chart Section */
+.chartWrapper {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-top: 20px;
+  
+}

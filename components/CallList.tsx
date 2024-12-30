@@ -109,4 +109,3 @@ const CallList = ({ type }: { type: 'ended' | 'upcoming' | 'recordings' }) => {
 
 export default CallList;
 
-//user_2mWUUTftWoX0dq1u0Rp9kMVwPVR

@@ -1,0 +1,107 @@
+.chartCard {
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    transition: transform 0.3s ease;
+    
+  }
+  
+  .chartCard:hover {
+    transform: translateY(-5px);
+  }
+  
+  .chartCard h3 {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    color: #333;
+  }
+
+  /* Analytics Wrapper */
+.chartWrapper {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 25px;
+  margin-top: 30px;
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Chart Card */
+.chartCard {
+  background: #f9fafb;
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease-in-out;
+
+}
+
+.chartCard:hover {
+  transform: scale(1.05);
+}
+
+.chartCard h3 {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+
+/* Container for the whole Analytics Page */
+.container {
+  display: flex;
+  background-color: #f9fafb;
+  min-height: 100vh;
+}
+
+/* Sidebar Styling */
+.container > :first-child {
+  width: 300px; /* Fixed width for sidebar */
+  background-color: #2b2f3e; /* Dark background for sidebar */
+  color: #fff;
+  height: 100vh;
+  overflow-y: auto;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  
+}
+
+/* Main Content Styling */
+.mainContent {
+  flex: 1;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: none; /* Decreased width */
+  margin-left: 0px;
+  width: 83%;
+  margin-right: 20px;
+
+}
+
+/* Meeting Stats Section */
+.mainContent > :first-child {
+  background: linear-gradient(135deg, #131f39, #b3c0d4); /* Blue gradient */
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Analytics Chart Section */
+.mainContent > :nth-child(2) {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  flex: 1;
+
+}
+
+
+  

@@ -1,0 +1,33 @@
+.sidebar {
+    width: 250px;
+    background: linear-gradient(135deg, #0105f0, #2563eb);
+    color: #fff;
+    padding: 10px;
+    height: 100vh;
+    overflow-y: auto;
+    border-left: 1px solid #ccc;
+  }
+  
+  .title {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+  
+  .list {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .item {
+    padding: 8px 12px;
+    margin: 5px 0;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background 0.3s;
+  }
+  
+  .item:hover {
+    background: #3b82f6;
+  }
+  

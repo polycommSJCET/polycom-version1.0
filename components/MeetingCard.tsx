@@ -90,4 +90,4 @@ const MeetingCard = ({
   );
 };
 
-export default MeetingCard;
+export default MeetingCard
