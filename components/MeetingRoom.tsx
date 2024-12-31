@@ -28,7 +28,7 @@ import { cn } from '@/lib/utils';
 
 import { Button } from './ui/button';
 import { useUser } from "@clerk/nextjs";
-import { translateText } from './translateText';
+import { endcalltrigger, translateText } from './translateText';
 
 type CallLayoutType = 'grid' | 'speaker-left' | 'speaker-right';
 
@@ -47,6 +47,8 @@ const MeetingRoom = () => {
   console.log(callForAudio)
   const translatedTextRef = useRef<HTMLParagraphElement>(null);
   const transcriptElementRef = useRef<HTMLParagraphElement>(null);
+  const { useCallEndedBy } = useCallStateHooks();
+  const callEndedBy = useCallEndedBy();
 
   if (user) {
     console.log("hey user")
@@ -62,6 +64,14 @@ const MeetingRoom = () => {
         text: transcription
       },
     });
+  };
+
+  const handleCallEnd = () => {
+    if (callEndedBy) {
+
+      endcalltrigger(callEndedBy,callForAudio?.id)
+      // Add your desired functionality here
+    }
   };
 
   const handleTranslate = async (transcripts: string) => {
@@ -81,11 +91,17 @@ const MeetingRoom = () => {
   };
 
   useEffect(() => {
+    handleCallEnd();
+  }, [callEndedBy]);
+
+  useEffect(() => {
     if (!callForAudio) return;
 
     const unsubscribe = callForAudio.on("custom", (event: any) => {
       const payload = event.custom;
       console.log("Received payload:", payload.payload.text);
+
+    
 
       if (payload && payload.payload.text) {
         console.log("Received transcription event:", payload.payload.text);
@@ -100,6 +116,9 @@ const MeetingRoom = () => {
       unsubscribe();
     };
   }, [callForAudio]);
+
+
+  
 
   const [micStatus, setMicStatus] = useState('disabled');
   const [isTranscriptionEnabled, setIsTranscriptionEnabled] = useState(true);
