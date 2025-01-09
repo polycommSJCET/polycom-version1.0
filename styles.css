@@ -1,0 +1,42 @@
+/* Light Theme Colors */
+body {
+    background-color: #ffffff;
+    color: #333333;
+    font-family: 'Arial', sans-serif;
+}
+
+/* Modern Grid Background */
+body::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: linear-gradient(90deg, rgba(0, 0, 0, 0.05) 1px, transparent 1px), 
+                      linear-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+    background-size: 20px 20px;
+    z-index: -1;
+}
+
+/* Loader Page Styles */
+.loader-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #ffffff;
+    color: #333333;
+}
+
+/* Apply these styles to other pages */
+.page {
+    background-color: #ffffff;
+    color: #333333;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Ensure existing functions and styles are not affected */
+// ...existing code...

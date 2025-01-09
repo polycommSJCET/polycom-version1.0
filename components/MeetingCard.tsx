@@ -31,13 +31,13 @@ const MeetingCard = ({
   const { toast } = useToast();
 
   return (
-    <section className="flex min-h-[258px] w-full flex-col justify-between rounded-[14px] bg-dark-1 px-5 py-8 xl:max-w-[568px]">
+    <section className="flex min-h-[258px] w-full flex-col justify-between rounded-[14px] bg-slate-800 px-5 py-8 xl:max-w-[568px]">
       <article className="flex flex-col gap-5">
         <Image src={icon} alt="upcoming" width={28} height={28} />
         <div className="flex justify-between">
           <div className="flex flex-col gap-2">
-            <h1 className="text-2xl font-bold">{title}</h1>
-            <p className="text-base font-normal">{date}</p>
+            <h1 className="text-2xl text-white font-bold">{title}</h1>
+            <p className="text-base text-white font-normal">{date}</p>
           </div>
         </div>
       </article>
@@ -54,7 +54,7 @@ const MeetingCard = ({
               style={{ top: 0, left: index * 28 }}
             />
           ))}
-          <div className="flex-center absolute left-[136px] size-10 rounded-full border-[5px] border-dark-3 bg-dark-4">
+          <div className="flex-center absolute left-[136px] size-10 rounded-full border-[5px] border-slate-600 bg-slate-700">
             +5
           </div>
         </div>
@@ -73,7 +73,7 @@ const MeetingCard = ({
                   title: "Link Copied",
                 });
               }}
-              className="bg-dark-4 px-6"
+              className="bg-slate-700 px-6"
             >
               <Image
                 src="/icons/copy.svg"
