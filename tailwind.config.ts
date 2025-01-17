@@ -20,18 +20,36 @@ const config = {
     extend: {
       colors: {
         dark: {
-          1: '#1C1F2E',
-          2: '#161925',
-          3: '#252A41',
-          4: '#1E2757',
+          1: '#0A0F1C',
+          2: '#131827',
+          3: '#1E2438',
+          4: '#2A3149',
+        },
+        light: {
+          1: '#FFFFFF',
+          2: '#F8FAFC',
+          3: '#F1F5F9',
+          4: '#E2E8F0',
         },
         blue: {
-          1: '#0E78F9',
+          1: '#3B82F6',
+          2: '#60A5FA',
+          accent: '#2563EB',
         },
         sky: {
-          1: '#C9DDFF',
-          2: '#ECF0FF',
-          3: '#F5FCFF',
+          1: '#E0F2FE',
+          2: '#F0F9FF',
+          3: '#F8FAFC',
+        },
+        gray: {
+          1: '#64748B',
+          2: '#94A3B8',
+          3: '#CBD5E1',
+        },
+        accent: {
+          1: '#8B5CF6',
+          2: '#6D28D9',
+          3: '#4C1D95',
         },
         orange: {
           1: '#FF742E',
@@ -42,6 +60,12 @@ const config = {
         yellow: {
           1: '#F9A90E',
         },
+      },
+      boxShadow: {
+        'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
+      },
+      backdropBlur: {
+        'glass': 'blur(4px)',
       },
       keyframes: {
         'accordion-down': {
@@ -59,6 +83,7 @@ const config = {
       },
       backgroundImage: {
         hero: "url('/images/hero-background.png')",
+        'grid-pattern': "linear-gradient(to right, #E2E8F0 1px, transparent 1px), linear-gradient(to bottom, #E2E8F0 1px, transparent 1px)",
       },
     },
   },
