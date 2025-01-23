@@ -323,8 +323,8 @@ const MeetingRoom = () => {
         {isTranscriptVisible && (
           <div style={{ position: "fixed", bottom: "100px", left: "0", right: "0", textAlign: "center" }}>
             <div>
-              <p ref={transcriptElementRef}></p>
-              <p ref={translatedTextRef}></p>
+              <p className='text-orange-800' ref={transcriptElementRef}></p>
+              <p className='text-orange-800' ref={translatedTextRef}></p>
             </div>
           </div>
         )}
