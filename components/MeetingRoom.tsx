@@ -83,6 +83,7 @@ const MeetingRoom = () => {
       }
     } else {
       console.log(response.translated_text);
+      sendtranscribe(response.translated_text);
       if (translatedTextRef.current) {
         translatedTextRef.current.innerText = response.translated_text;
       }
@@ -108,7 +109,7 @@ const MeetingRoom = () => {
         if (transcriptElementRef.current) {
           transcriptElementRef.current.innerText = payload.payload.text;
         }
-        handleTranslate(payload.payload.text);
+        // handleTranslate(payload.payload.text);
       }
     });
 
@@ -180,7 +181,7 @@ const MeetingRoom = () => {
       transcriptRef.current = newTranscript.trim();
 
       console.log("step 1 current" + transcriptRef.current);
-      sendtranscribe(transcriptRef.current);
+      handleTranslate(transcriptRef.current);
 
       if (transcriptElementRef.current) {
         transcriptElementRef.current.innerText = transcriptRef.current;
@@ -323,8 +324,8 @@ const MeetingRoom = () => {
         {isTranscriptVisible && (
           <div style={{ position: "fixed", bottom: "100px", left: "0", right: "0", textAlign: "center" }}>
             <div>
-              <p ref={transcriptElementRef}></p>
-              <p ref={translatedTextRef}></p>
+              <p className='text-orange-800' ref={transcriptElementRef}></p>
+              <p className='text-orange-800' ref={translatedTextRef}></p>
             </div>
           </div>
         )}
