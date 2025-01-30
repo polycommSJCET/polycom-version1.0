@@ -30,6 +30,7 @@ import { Button } from './ui/button';
 import { useUser } from "@clerk/nextjs";
 import { endcalltrigger, translateText } from './translateText';
 
+
 type CallLayoutType = 'grid' | 'speaker-left' | 'speaker-right';
 
 const MeetingRoom = () => {
@@ -44,6 +45,8 @@ const MeetingRoom = () => {
   const [showParticipants, setShowParticipants] = useState(false);
   const { useCallCallingState } = useCallStateHooks();
   const callForAudio = useCall();
+  const { useMicrophoneState } = useCallStateHooks();
+  const { isSpeakingWhileMuted } = useMicrophoneState();
   console.log(callForAudio)
   const translatedTextRef = useRef<HTMLParagraphElement>(null);
   const transcriptElementRef = useRef<HTMLParagraphElement>(null);
@@ -54,6 +57,8 @@ const MeetingRoom = () => {
     console.log("hey user")
     console.log(user.fullName)
   }
+
+
   
 
   const sendtranscribe = async (transcription: any) => {
@@ -65,6 +70,8 @@ const MeetingRoom = () => {
       },
     });
   };
+
+  
 
   const handleCallEnd = () => {
     if (callEndedBy) {
@@ -132,10 +139,76 @@ const MeetingRoom = () => {
       return;
     }
 
+
+
+
     const subscription = callForAudio.microphone.state.status$.subscribe((status) => {
       console.log('Mic status:', status);
+    
+      if (status === 'enabled') {
+        // Store eventTime in sessionStorage
+        sessionStorage.setItem(`eventTime+${callForAudio.cid}`, new Date().toISOString());
+      } else if (status === 'disabled') {
+        // Retrieve eventTime from sessionStorage
+        const previousEventTime = sessionStorage.getItem(`eventTime+${callForAudio.cid}`);
+        if (previousEventTime) {
+          const previousTime = new Date(previousEventTime);
+          const currentTime = new Date();
+          const timeTaken = (currentTime - previousTime) / 1000; // Time in seconds
+    
+          console.log(`Time taken: ${timeTaken} seconds`); 
+          
+          // Retrieve totalMicEnable from localStorage
+          const totalMicEnable = localStorage.getItem(`totalMicEnable+${callForAudio.cid}`) || 0;
+          const updatedTotal = parseFloat(totalMicEnable) + timeTaken;
+    
+          console.log(`${totalMicEnable} + ${timeTaken} = ${updatedTotal}`);
+          console.log(callForAudio.cid)
+          // Update totalMicEnable in localStorage
+          localStorage.setItem(`totalMicEnable+${callForAudio.cid}`, updatedTotal.toString());
+    
+          console.log(`Total mic enable time: ${updatedTotal} seconds`);
+        }
+      }
+    
+      // Update the mic status in the state (optional)
       setMicStatus(status || 'disabled');
     });
+
+
+    const cameraSubscription = callForAudio.camera.state.status$.subscribe((status) => {
+      console.log('Camera status:', status);
+    
+      if (status === 'enabled') {
+        // Store eventTime in sessionStorage
+        sessionStorage.setItem(`cameraEventTime+${callForAudio.cid}`, new Date().toISOString());
+      } else if (status === 'disabled') {
+        // Retrieve eventTime from sessionStorage
+        const previousEventTime = sessionStorage.getItem(`cameraEventTime+${callForAudio.cid}`);
+        if (previousEventTime) {
+          const previousTime = new Date(previousEventTime);
+          const currentTime = new Date();
+          const timeTaken = (currentTime - previousTime) / 1000; // Time in seconds
+    
+          console.log(`Camera time taken: ${timeTaken} seconds`);
+    
+          // Retrieve totalCameraEnable from localStorage
+          const totalCameraEnable = localStorage.getItem(`totalCameraEnable+${callForAudio.cid}`) || 0;
+          const updatedTotal = parseFloat(totalCameraEnable) + timeTaken;
+    
+          console.log(`${totalCameraEnable} + ${timeTaken} = ${updatedTotal}`);
+    
+          // Update totalCameraEnable in localStorage
+          localStorage.setItem(`totalCameraEnable+${callForAudio.cid}`, updatedTotal.toString());
+    
+          console.log(`Total camera enable time: ${updatedTotal} seconds`);
+        }
+      }
+    
+      // Update the camera status in the state (optional)
+      setCameraStatus(status || 'disabled');
+    });
+    
 
     return () => {
       subscription.unsubscribe();
