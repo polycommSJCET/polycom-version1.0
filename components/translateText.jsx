@@ -1,5 +1,5 @@
 // utils/translateAPI.js
-const pyApiUrl="https://127.0.0.1:443/"
+const pyApiUrl="http://127.0.0.1:5000/"
 // eslint-disable-next-line camelcase
 export const endcalltrigger=async(callendedby,meeting_id)=>{
   try{
@@ -25,6 +25,7 @@ export const endcalltrigger=async(callendedby,meeting_id)=>{
 }
 
 export const translateText = async (text,username, language,meetingid) => {
+  console.log("post");
     try {
       const response = await fetch(pyApiUrl+'translate', {
         method: 'POST',
@@ -32,9 +33,9 @@ export const translateText = async (text,username, language,meetingid) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          text: text,
+          text,
           speaker:username,
-          language: language,
+          language,
           meeting_id:meetingid,
         }),
       });
@@ -46,7 +47,7 @@ export const translateText = async (text,username, language,meetingid) => {
       const data = await response.json();
       return data; // { original_text, detected_language, translated_text }
     } catch (error) {
-      console.error('Translation failed:', error);
+      console.error('Translation failed:', error.message);
       return { error: error.message };
     }
   };

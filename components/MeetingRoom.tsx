@@ -53,10 +53,10 @@ const MeetingRoom = () => {
   const { useCallEndedBy } = useCallStateHooks();
   const callEndedBy = useCallEndedBy();
 
-  if (user) {
-    console.log("hey user")
-    console.log(user.fullName)
-  }
+  // if (user) {
+  //   console.log("hey user")
+  //   console.log(user.fullName)
+  // }
 
 
   
@@ -82,6 +82,7 @@ const MeetingRoom = () => {
   };
 
   const handleTranslate = async (transcripts: string) => {
+    console.log('sending..');
     const response = await translateText(transcripts,user?.fullName,transcriptionLanguage,callForAudio?.id);
     if (response.error) {
       setTransError(response.error);
@@ -397,8 +398,8 @@ const MeetingRoom = () => {
         {isTranscriptVisible && (
           <div style={{ position: "fixed", bottom: "100px", left: "0", right: "0", textAlign: "center" }}>
             <div>
-              <p className='text-orange-800' ref={transcriptElementRef}></p>
-              <p className='text-orange-800' ref={translatedTextRef}></p>
+              <p className='text-blue-700' ref={transcriptElementRef}></p>
+              <p className='text-blue-700' ref={translatedTextRef}></p>
             </div>
           </div>
         )}

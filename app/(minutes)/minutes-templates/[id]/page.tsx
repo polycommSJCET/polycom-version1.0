@@ -1,6 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useUser } from '@clerk/nextjs';
+import { toast } from 'sonner';
+const pyApiUrl="https://127.0.0.1:443/"
 
 const templates = [
   {
@@ -13,7 +16,7 @@ const templates = [
     id: 2,
     name: 'Modern Template',
     description: 'A modern design with enhanced readability and structure',
-    pdfUrl: '/templates/template1.pdf'
+    pdfUrl: '/templates/template2.pdf'
   }
 ];
 
@@ -41,6 +44,64 @@ const PDFPreview = ({ url }: { url: string }) => {
 
 const MinutesTemplatePage = ({ params }: { params: { id: string } }) => {
   const [selectedTemplate, setSelectedTemplate] = useState<number | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const { user, isLoaded } = useUser();
+
+  const handleGenerateMinutes = async () => {
+    if (!user || !selectedTemplate) return;
+
+    setIsGenerating(true);
+    try {
+      const response = await fetch(pyApiUrl + 'generate-minutes', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: user.id,
+          meetingId: params.id,
+          templateId: selectedTemplate,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate minutes');
+      }
+
+      console.log(response);
+
+      // Get the blob from response
+      const blob = await response.blob();
+      
+      // Create a URL for the blob
+      const url = window.URL.createObjectURL(blob);
+      
+      // Create a temporary anchor element
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `meeting-minutes-${params.id}.docx`; // Set the file name
+      
+      // Trigger the download
+      document.body.appendChild(a);
+      a.click();
+      
+      // Cleanup
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      toast.success('Minutes generated and downloaded successfully!');
+
+    } catch (error) {
+      console.error('Error generating minutes:', error);
+      toast.error('Failed to generate minutes. Please try again.');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  if (!isLoaded) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
@@ -62,8 +123,8 @@ const MinutesTemplatePage = ({ params }: { params: { id: string } }) => {
               key={template.id}
               className={`group relative cursor-pointer overflow-visible rounded-xl bg-white/70 p-4 backdrop-blur-sm transition-all duration-300 hover:shadow-xl ${
                 selectedTemplate === template.id
-                  ? 'ring-2 ring-blue-500 shadow-blue-500/20'
-                  : 'hover:scale-[1.02] shadow-lg'
+                  ? 'shadow-blue-500/20 ring-2 ring-blue-500'
+                  : 'shadow-lg hover:scale-[1.02]'
               }`}
               onClick={() => setSelectedTemplate(template.id)}
             >
@@ -84,25 +145,21 @@ const MinutesTemplatePage = ({ params }: { params: { id: string } }) => {
         </div>
 
         {/* Footer Button */}
-        <div className="fixed bottom-0 left-0 right-0 border-t bg-white/80 p-4 backdrop-blur-md">
+        <div className="fixed inset-x-0 bottom-0 border-t bg-white/80 p-4 backdrop-blur-md">
           <div className="container mx-auto flex items-center justify-between">
             <div className="text-sm text-gray-600">
               {selectedTemplate ? 'Template selected' : 'Please select a template'}
             </div>
             <button
               className={`rounded-lg px-8 py-3 font-medium transition-all duration-300 ${
-                selectedTemplate
+                selectedTemplate && !isGenerating
                   ? 'bg-blue-500 text-white hover:bg-blue-600 shadow-lg shadow-blue-500/30'
                   : 'cursor-not-allowed bg-gray-200 text-gray-400'
               }`}
-              disabled={!selectedTemplate}
-              onClick={() => {
-                if (selectedTemplate) {
-                  console.log(`Selected template: ${selectedTemplate}`);
-                }
-              }}
+              disabled={!selectedTemplate || isGenerating}
+              onClick={handleGenerateMinutes}
             >
-              Generate Minutes
+              {isGenerating ? 'Generating...' : 'Generate Minutes'}
             </button>
           </div>
         </div>
