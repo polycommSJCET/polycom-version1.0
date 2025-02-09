@@ -5,6 +5,8 @@ export interface Meeting {
   ended_by_name: string | null;
   ended_by_role: string | null;
   ended_at: string | null;
+  started_at?: string;
+  duration: { seconds: number; hours: number; minutes: number };
   user_metadata: {
     title?: string;
     description?: string;

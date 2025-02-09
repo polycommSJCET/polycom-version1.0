@@ -52,6 +52,7 @@ const MeetingRoom = () => {
   const transcriptElementRef = useRef<HTMLParagraphElement>(null);
   const { useCallEndedBy } = useCallStateHooks();
   const callEndedBy = useCallEndedBy();
+  const callStartTimeRef = useRef<string | null>(null);
 
   // if (user) {
   //   console.log("hey user")
@@ -75,8 +76,12 @@ const MeetingRoom = () => {
 
   const handleCallEnd = () => {
     if (callEndedBy) {
-
-      endcalltrigger(callEndedBy,callForAudio?.id)
+      const callStartTime = callStartTimeRef.current;
+      const callDetails = {
+        ...callEndedBy,
+        callStartTime,
+      };
+      endcalltrigger(callDetails, callForAudio?.id);
       // Add your desired functionality here
     }
   };
@@ -102,6 +107,12 @@ const MeetingRoom = () => {
   useEffect(() => {
     handleCallEnd();
   }, [callEndedBy]);
+
+  useEffect(() => {
+    if (callForAudio) {
+      callStartTimeRef.current = new Date().toISOString();
+    }
+  }, [callForAudio]);
 
   useEffect(() => {
     if (!callForAudio) return;

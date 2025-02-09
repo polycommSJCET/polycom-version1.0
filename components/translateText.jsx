@@ -1,5 +1,5 @@
 // utils/translateAPI.js
-const pyApiUrl="http://127.0.0.1:5000/"
+const pyApiUrl="https://127.0.0.1:443/"
 // eslint-disable-next-line camelcase
 export const endcalltrigger=async(callendedby,meeting_id)=>{
   try{
