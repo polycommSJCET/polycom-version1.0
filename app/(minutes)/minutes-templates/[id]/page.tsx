@@ -42,61 +42,71 @@ const PDFPreview = ({ url }: { url: string }) => {
   );
 };
 
+interface FormData {
+  logo: File | null;
+  organizationName: string;
+  title: string;
+  meetingType: string;
+}
+
 const MinutesTemplatePage = ({ params }: { params: { id: string } }) => {
   const [selectedTemplate, setSelectedTemplate] = useState<number | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const { user, isLoaded } = useUser();
+  const [showFormOverlay, setShowFormOverlay] = useState(false);
+  const [formData, setFormData] = useState<FormData>({
+    logo: null,
+    organizationName: '',
+    title: '',
+    meetingType: ''
+  });
 
-  const handleGenerateMinutes = async () => {
+  const handleFormSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     if (!user || !selectedTemplate) return;
 
     setIsGenerating(true);
+    const formDataToSend = new FormData();
+    formDataToSend.append('userId', user.id);
+    formDataToSend.append('meetingId', params.id);
+    formDataToSend.append('templateId', selectedTemplate.toString());
+    if (formData.logo) {
+      formDataToSend.append('logo', formData.logo);
+    }
+    formDataToSend.append('organizationName', formData.organizationName);
+    formDataToSend.append('title', formData.title);
+    formDataToSend.append('meetingType', formData.meetingType);
+
     try {
       const response = await fetch(pyApiUrl + 'generate-minutes', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userId: user.id,
-          meetingId: params.id,
-          templateId: selectedTemplate,
-        }),
+        body: formDataToSend,
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to generate minutes');
-      }
+      if (!response.ok) throw new Error('Failed to generate minutes');
 
-      console.log(response);
-
-      // Get the blob from response
       const blob = await response.blob();
-      
-      // Create a URL for the blob
       const url = window.URL.createObjectURL(blob);
-      
-      // Create a temporary anchor element
       const a = document.createElement('a');
       a.href = url;
-      a.download = `meeting-minutes-${params.id}.docx`; // Set the file name
-      
-      // Trigger the download
+      a.download = `meeting-minutes-${params.id}.docx`;
       document.body.appendChild(a);
       a.click();
-      
-      // Cleanup
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
 
       toast.success('Minutes generated and downloaded successfully!');
-
+      setShowFormOverlay(false);
     } catch (error) {
       console.error('Error generating minutes:', error);
       toast.error('Failed to generate minutes. Please try again.');
     } finally {
       setIsGenerating(false);
     }
+  };
+
+  const handleGenerateMinutes = () => {
+    setShowFormOverlay(true);
   };
 
   if (!isLoaded) {
@@ -164,6 +174,84 @@ const MinutesTemplatePage = ({ params }: { params: { id: string } }) => {
           </div>
         </div>
       </div>
+
+      {/* Form Overlay */}
+      {showFormOverlay && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
+            <h2 className="mb-4 text-xl font-semibold">Meeting Details</h2>
+            <form onSubmit={handleFormSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Organization Logo</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    logo: e.target.files?.[0] || null
+                  })}
+                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Organization Name</label>
+                <input
+                  type="text"
+                  required
+                  value={formData.organizationName}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    organizationName: e.target.value
+                  })}
+                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Meeting Title</label>
+                <input
+                  type="text"
+                  required
+                  value={formData.title}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    title: e.target.value
+                  })}
+                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Meeting Type</label>
+                <input
+                  type="text"
+                  required
+                  value={formData.meetingType}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    meetingType: e.target.value
+                  })}
+                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                />
+              </div>
+              <div className="mt-6 flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowFormOverlay(false)}
+                  className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isGenerating}
+                  className="rounded-md bg-blue-500 px-4 py-2 text-sm font-medium text-white hover:bg-blue-600 disabled:opacity-50"
+                >
+                  {isGenerating ? 'Generating...' : 'Generate Minutes'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
