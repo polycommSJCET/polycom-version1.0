@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useUser } from '@clerk/nextjs';
 import { supabase } from '@/utils/supabase';
 import type { Meeting } from '@/types/meeting';
-import { formatDistance, format, parseISO } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 
 const formatMeetingDate = (timestamp: string | undefined): string => {
   if (!timestamp) return 'Date not available';
@@ -22,28 +22,11 @@ const formatMeetingDate = (timestamp: string | undefined): string => {
   }
 };
 
-const calculateDuration = (endTimestamp: string | null, startTimestamp: string | undefined): string => {
-  if (!endTimestamp || !startTimestamp) return 'In progress';
+const calculateDuration = (duration: { seconds: number; hours: number; minutes: number }): string => {
+  if (!duration) return 'In progress';
   
-  try {
-    // Handle both ISO and Unix timestamp formats
-    const end = endTimestamp.includes('T') 
-      ? parseISO(endTimestamp)
-      : new Date(parseInt(endTimestamp));
-    
-    const start = startTimestamp.includes('T')
-      ? parseISO(startTimestamp)
-      : new Date(parseInt(startTimestamp));
-    
-    if (isNaN(end.getTime()) || isNaN(start.getTime())) {
-      return 'Invalid duration';
-    }
-    
-    return formatDistance(end, start, { addSuffix: false });
-  } catch (error) {
-    console.error('Error calculating duration:', error);
-    return 'Unknown duration';
-  }
+  const { hours, minutes, seconds } = duration;
+  return `${hours}h ${minutes}m ${seconds.toFixed(2)}s`;
 };
 
 const HistoryPage: React.FC = () => {
@@ -102,7 +85,7 @@ const HistoryPage: React.FC = () => {
             : meeting.user_metadata || {};
 
           // Extract starts_at from metadata
-          const startTime = metadata.starts_at || metadata.start_time;
+          const startTime = meeting.started_at;
             
           return (
             <div key={meeting.id} className="rounded-lg bg-white p-6 shadow-md">
@@ -122,15 +105,13 @@ const HistoryPage: React.FC = () => {
                         </p>
                       )}
                       <p>
-                        Duration:{' '}
-                        {calculateDuration(meeting.ended_at, startTime)}
+                        Duration: {calculateDuration(meeting.duration)}
                       </p>
                       <p>
                         Status: {meeting.ended_at ? 'Completed' : 'In Progress'}
                       </p>
                       <p>
-                        Ended by:{' '}
-                        {meeting.ended_at ? meeting.ended_by_name : 'Not ended yet'}
+                        Ended by: {meeting.ended_at ? meeting.ended_by_name : 'Not ended yet'}
                       </p>
                     </div>
                     <p className="mt-2 text-gray-700">
