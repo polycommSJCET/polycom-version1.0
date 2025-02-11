@@ -28,12 +28,15 @@ import { cn } from '@/lib/utils';
 
 import { Button } from './ui/button';
 import { useUser } from "@clerk/nextjs";
-import { endcalltrigger, translateText } from './translateText';
+import { endCallNotification, endcalltrigger, logMicUsage, translateText } from './translateText';
 
 
 type CallLayoutType = 'grid' | 'speaker-left' | 'speaker-right';
 
+
+
 const MeetingRoom = () => {
+  
   const { isSignedIn, user } = useUser();
   const [listening, setListening] = useState(false);
   const [error, setError] = useState('');
@@ -116,6 +119,7 @@ const MeetingRoom = () => {
 
   useEffect(() => {
     if (!callForAudio) return;
+    
 
     const unsubscribe = callForAudio.on("custom", (event: any) => {
       const payload = event.custom;
@@ -141,6 +145,7 @@ const MeetingRoom = () => {
   
 
   const [micStatus, setMicStatus] = useState('disabled');
+  const [cameraStatus, setCameraStatus] = useState('disabled');
   const [isTranscriptionEnabled, setIsTranscriptionEnabled] = useState(true);
   const [transcriptionLanguage, setTranscriptionLanguage] = useState('ml-IN');
   const [isTranscriptVisible, setIsTranscriptVisible] = useState(true);
@@ -149,6 +154,12 @@ const MeetingRoom = () => {
     if (!callForAudio || !callForAudio.microphone?.state?.status$) {
       console.log('Waiting for microphone...');
       return;
+    }
+
+    console.log(callEndedBy)
+
+    if (callEndedBy) {
+      endCallNotification('123','123')
     }
 
 
@@ -166,7 +177,12 @@ const MeetingRoom = () => {
         if (previousEventTime) {
           const previousTime = new Date(previousEventTime);
           const currentTime = new Date();
-          const timeTaken = (currentTime - previousTime) / 1000; // Time in seconds
+          const timeTaken = (currentTime - previousTime) / 1000;
+          
+          logMicUsage(previousTime,currentTime,user?.fullName,callForAudio?.id)// Time in seconds
+
+
+
     
           console.log(`Time taken: ${timeTaken} seconds`); 
           
@@ -192,38 +208,34 @@ const MeetingRoom = () => {
       console.log('Camera status:', status);
     
       if (status === 'enabled') {
-        // Store eventTime in sessionStorage
         sessionStorage.setItem(`cameraEventTime+${callForAudio.cid}`, new Date().toISOString());
       } else if (status === 'disabled') {
-        // Retrieve eventTime from sessionStorage
         const previousEventTime = sessionStorage.getItem(`cameraEventTime+${callForAudio.cid}`);
+       // console.log(previousEventTime)
         if (previousEventTime) {
           const previousTime = new Date(previousEventTime);
           const currentTime = new Date();
-          const timeTaken = (currentTime - previousTime) / 1000; // Time in seconds
+          const timeTaken = (currentTime - previousTime) / 1000;
     
-          console.log(`Camera time taken: ${timeTaken} seconds`);
-    
-          // Retrieve totalCameraEnable from localStorage
           const totalCameraEnable = localStorage.getItem(`totalCameraEnable+${callForAudio.cid}`) || 0;
           const updatedTotal = parseFloat(totalCameraEnable) + timeTaken;
     
-          console.log(`${totalCameraEnable} + ${timeTaken} = ${updatedTotal}`);
-    
-          // Update totalCameraEnable in localStorage
           localStorage.setItem(`totalCameraEnable+${callForAudio.cid}`, updatedTotal.toString());
-    
-          console.log(`Total camera enable time: ${updatedTotal} seconds`);
+
+          console.log(`Total cam enable time: ${updatedTotal} seconds`);
         }
       }
     
-      // Update the camera status in the state (optional)
       setCameraStatus(status || 'disabled');
     });
+
+    
+    
     
 
     return () => {
       subscription.unsubscribe();
+      cameraSubscription.unsubscribe();
     };
   }, [callForAudio]);
 
@@ -236,6 +248,11 @@ const MeetingRoom = () => {
   }, [micStatus]);
 
   const callingState = useCallCallingState();
+  console.log("calling state",callingState)
+
+  if (callingState==='left') {
+    
+  }
 
   // Speech Recognition Logic
   const recognitionRef = useRef<null | any>(null);
