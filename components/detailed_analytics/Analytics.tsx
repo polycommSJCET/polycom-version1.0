@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Card } from '@/components/ui/card';
-import { Clock, Users, Mic, Video, Calendar } from 'lucide-react';
+import { Clock, Users, Calendar } from 'lucide-react';
 import { format } from 'date-fns';
 import {
   BarChart,
@@ -37,7 +37,7 @@ interface ActivityData {
 
 const Analytics = ({ meetingId }: { meetingId: string }) => {
   const [meetingData, setMeetingData] = useState<MeetingData | null>(null);
-  const [activityData, setActivityData] = useState<ActivityData[]>([]);
+  // const [activityData, setActivityData] = useState<ActivityData[]>([]);
   const [speakingTimeData, setSpeakingTimeData] = useState<any[]>([]);
   const [participationStats, setParticipationStats] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -74,10 +74,10 @@ const Analytics = ({ meetingId }: { meetingId: string }) => {
     return parts.join(' ') || '0s';
   };
 
-  const activityChartData = participationStats.map(stat => ({
-    name: stat.name,
-    duration: stat.value
-  }));
+  // const activityChartData = participationStats.map(stat => ({
+  //   name: stat.name,
+  //   duration: stat.value
+  // }));
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white p-8">

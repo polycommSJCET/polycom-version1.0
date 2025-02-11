@@ -114,9 +114,9 @@ const HistoryPage: React.FC = () => {
                         Ended by: {meeting.ended_at ? meeting.ended_by_name : 'Not ended yet'}
                       </p>
                     </div>
-                    <p className="mt-2 text-gray-700">
+                    {/* <p className="mt-2 text-gray-700">
                       {metadata.description || 'No description provided'}
-                    </p>
+                    </p> */}
                   </div>
                   <div className="flex gap-3">
                     <Link href={`/analytics/${meeting.meeting_id}`}>
