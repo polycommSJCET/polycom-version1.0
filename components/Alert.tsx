@@ -30,7 +30,7 @@ const Alert = ({ title, iconUrl }: PermissionCardProps) => {
             </Button>
 
             {/* Show Analytics Button */}
-            <Button asChild className="bg-green-1">
+            <Button asChild className="bg-green-500">
               <Link href="/analytics">Show Analytics</Link>
             </Button>
           </div>
