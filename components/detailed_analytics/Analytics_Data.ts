@@ -1,5 +1,8 @@
 import { supabase } from '@/utils/supabase';
 import Papa from 'papaparse';
+import axios from 'axios';
+
+const PYTHON_SERVER_URL = 'https://127.0.0.1:443';
 
 interface ParsedAnalyticsRow {
     username: string;
@@ -220,3 +223,31 @@ export async function fetchMeetingData(meetingId: string) {
         };
     }
 }
+
+
+interface PresenceData {
+  userName: string;
+  callId: string;
+  eventType: 'joined' | 'left';
+  eventTime: string;
+}
+
+export const logPresenceToServer = async (data: PresenceData) => {
+  try {
+    const response = await fetch(`${PYTHON_SERVER_URL}/log-presence`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to log presence data');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error logging presence data:', error);
+  }
+};
