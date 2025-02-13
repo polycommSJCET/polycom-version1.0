@@ -28,7 +28,7 @@ import { cn } from '@/lib/utils';
 
 import { Button } from './ui/button';
 import { useUser } from "@clerk/nextjs";
-import { endCallNotification, endcalltrigger, logMicUsage, translateText } from './translateText';
+import { endCallNotification, endcalltrigger, logMicUsage, translateText, logCameraUsage } from './translateText';
 
 
 type CallLayoutType = 'grid' | 'speaker-left' | 'speaker-right';
@@ -216,6 +216,8 @@ const MeetingRoom = () => {
           const previousTime = new Date(previousEventTime);
           const currentTime = new Date();
           const timeTaken = (currentTime - previousTime) / 1000;
+
+          logCameraUsage(previousTime,currentTime,user?.fullName,callForAudio?.id)
     
           const totalCameraEnable = localStorage.getItem(`totalCameraEnable+${callForAudio.cid}`) || 0;
           const updatedTotal = parseFloat(totalCameraEnable) + timeTaken;

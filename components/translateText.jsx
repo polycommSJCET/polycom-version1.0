@@ -110,5 +110,35 @@ export const translateText = async (text,username, language,meetingid) => {
       return { error: error.message };
     }
   };
+
+
+
+    export const logCameraUsage = async (camStartTime, camEndTime,username,meeting_id) => {
+    try {
+      console.log("Logging camera usage...");
   
+      const response = await fetch(pyApiUrl + "camera-usage", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username,
+          camera_start_time: camStartTime,
+          camera_end_time: camEndTime,
+          meeting_id
+        }),
+      });
   
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status}`);
+      }
+  
+      const data = await response.json();
+      console.log("Camera usage logged successfully:", data);
+      return data;
+    } catch (error) {
+      console.error("Failed to log camera usage:", error.message);
+      return { error: error.message };
+    }
+  };
