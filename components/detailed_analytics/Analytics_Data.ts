@@ -1,6 +1,5 @@
 import { supabase } from '@/utils/supabase';
 import Papa from 'papaparse';
-import axios from 'axios';
 
 const PYTHON_SERVER_URL = 'https://127.0.0.1:443';
 
@@ -14,6 +13,12 @@ interface ParsedCameraRow {
     username: string;
     'camera start time': string;
     'camera end time': string;
+}
+
+interface ParsedPresenceRow {
+    'event time': string;
+    'event type': 'joined' | 'left';
+    'user name': string;
 }
 
 const BUCKET_NAME = 'Polycomm';  // Updated bucket name to lowercase
@@ -224,6 +229,80 @@ export async function fetchMeetingData(meetingId: string) {
     }
 }
 
+export async function fetchPresenceAnalytics(meetingId: string) {
+    try {
+        const presenceAnalyticsFilePath = `meetings/${meetingId}/presence_analytics_data.csv`;
+
+        // Fetch presence analytics file from Supabase storage
+        const { data: presenceDataCsv, error: presenceFileError } = await supabase
+            .storage
+            .from(BUCKET_NAME)
+            .download(presenceAnalyticsFilePath);
+
+        if (presenceFileError) {
+            console.error('Error fetching presence analytics file:', presenceFileError);
+            return [];
+        }
+
+        // Convert Blob to text
+        const presenceDataText = await presenceDataCsv.text();
+
+        // Parse CSV data
+        const parsedPresenceData = Papa.parse(presenceDataText, {
+            header: true,
+            skipEmptyLines: true,
+            transformHeader: (header) => header.trim().toLowerCase(),
+        }).data as ParsedPresenceRow[];
+
+        console.log('Raw parsed presence data:', parsedPresenceData);
+
+        // Group events by user
+        const userEvents = parsedPresenceData.reduce((acc, row) => {
+            const userName = row['user name'];
+            if (!acc[userName]) {
+                acc[userName] = [];
+            }
+            acc[userName].push({
+                time: new Date(row['event time']).getTime(),
+                type: row['event type']
+            });
+            return acc;
+        }, {} as { [key: string]: { time: number, type: string }[] });
+
+        // Process events for each user
+        const presenceTimeData = Object.entries(userEvents).map(([userName, events]) => {
+            // Sort events by time
+            events.sort((a, b) => a.time - b.time);
+            
+            let totalPresenceTime = 0;
+            let lastJoinTime: number | null = null;
+
+            events.forEach((event, index) => {
+                if (event.type === 'joined') {
+                    lastJoinTime = event.time;
+                } else if (event.type === 'left' && lastJoinTime !== null) {
+                    totalPresenceTime += Math.floor((event.time - lastJoinTime) / 1000);
+                    lastJoinTime = null;
+                }
+            });
+
+            return {
+                name: userName,
+                presenceTime: totalPresenceTime,
+                events: events.map(e => ({
+                    time: new Date(e.time).toISOString(),
+                    type: e.type
+                }))
+            };
+        });
+
+        return presenceTimeData;
+
+    } catch (error) {
+        console.error('Error in fetchPresenceAnalytics:', error);
+        return [];
+    }
+}
 
 interface PresenceData {
   userName: string;
