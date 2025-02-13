@@ -37,8 +37,8 @@ interface ActivityData {
 
 const Analytics = ({ meetingId }: { meetingId: string }) => {
   const [meetingData, setMeetingData] = useState<MeetingData | null>(null);
-  // const [activityData, setActivityData] = useState<ActivityData[]>([]);
   const [speakingTimeData, setSpeakingTimeData] = useState<any[]>([]);
+  const [cameraTimeData, setCameraTimeData] = useState<any[]>([]);
   const [participationStats, setParticipationStats] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -51,6 +51,7 @@ const Analytics = ({ meetingId }: { meetingId: string }) => {
         console.log('processed data', processedData);
         setMeetingData(meetingData);
         setSpeakingTimeData(processedData.speakingTimeData);
+        setCameraTimeData(processedData.cameraTimeData);
         setParticipationStats(processedData.participationStats);
       } catch (error) {
         console.error('Error loading meeting data:', error);
@@ -65,19 +66,14 @@ const Analytics = ({ meetingId }: { meetingId: string }) => {
     const hours = Math.floor(duration.hours);
     const minutes = Math.floor(duration.minutes);
     const seconds = Math.floor(duration.seconds);
-    
+
     const parts = [];
     if (hours > 0) parts.push(`${hours}h`);
     if (minutes > 0) parts.push(`${minutes}m`);
     if (seconds > 0) parts.push(`${seconds}s`);
-    
+
     return parts.join(' ') || '0s';
   };
-
-  // const activityChartData = participationStats.map(stat => ({
-  //   name: stat.name,
-  //   duration: stat.value
-  // }));
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white p-8">
@@ -173,7 +169,7 @@ const Analytics = ({ meetingId }: { meetingId: string }) => {
 
           {/* Charts Section */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Activity Overview Chart */}
+            {/* Speaking Time Chart */}
             <Card className="transform transition-all duration-300 hover:shadow-xl overflow-hidden">
               <div className="p-6 bg-gradient-to-br from-indigo-50/50 to-white">
                 <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center">
@@ -186,10 +182,17 @@ const Analytics = ({ meetingId }: { meetingId: string }) => {
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={speakingTimeData}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                      <XAxis dataKey="name" />
+                      <XAxis 
+                        dataKey="name"
+                        angle={-45}
+                        textAnchor="end"
+                        height={60}
+                        interval={0}
+                        tick={{fontSize: 12}}
+                      />
                       <YAxis />
-                      <Tooltip 
-                        contentStyle={{ 
+                      <Tooltip
+                        contentStyle={{
                           backgroundColor: '#fff',
                           border: 'none',
                           borderRadius: '8px',
@@ -203,12 +206,49 @@ const Analytics = ({ meetingId }: { meetingId: string }) => {
               </div>
             </Card>
 
-            {/* Participant Activity */}
-            <Card className="transform transition-all duration-300 hover:shadow-xl">
+            {/* Camera Time Chart */}
+            <Card className="transform transition-all duration-300 hover:shadow-xl overflow-hidden">
               <div className="p-6 bg-gradient-to-br from-green-50/50 to-white">
                 <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center">
                   <div className="p-2 bg-green-100 rounded-lg mr-3">
                     <Users className="h-5 w-5 text-green-600" />
+                  </div>
+                  Camera Time Overview
+                </h2>
+                <div className="h-[350px] p-4 bg-white rounded-xl shadow-inner">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={cameraTimeData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                      <XAxis 
+                        dataKey="name"
+                        angle={-45}
+                        textAnchor="end"
+                        height={60}
+                        interval={0}
+                        tick={{fontSize: 12}}
+                      />
+                      <YAxis />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: '#fff',
+                          border: 'none',
+                          borderRadius: '8px',
+                          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                        }}
+                      />
+                      <Bar dataKey="cameraTime" fill="#22c55e" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            </Card>
+
+            {/* Speaking Time Details */}
+            <Card className="transform transition-all duration-300 hover:shadow-xl">
+              <div className="p-6 bg-gradient-to-br from-indigo-50/50 to-white">
+                <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center">
+                  <div className="p-2 bg-indigo-100 rounded-lg mr-3">
+                    <Users className="h-5 w-5 text-indigo-600" />
                   </div>
                   Speaking Time Details
                 </h2>
@@ -226,6 +266,38 @@ const Analytics = ({ meetingId }: { meetingId: string }) => {
                           <p className="text-sm font-medium text-gray-900">{participant.name}</p>
                           <p className="text-sm font-semibold text-blue-600">
                             {participant.speakingTime}s
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </Card>
+
+            {/* Camera Time Details */}
+            <Card className="transform transition-all duration-300 hover:shadow-xl">
+              <div className="p-6 bg-gradient-to-br from-green-50/50 to-white">
+                <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center">
+                  <div className="p-2 bg-green-100 rounded-lg mr-3">
+                    <Users className="h-5 w-5 text-green-600" />
+                  </div>
+                  Camera Time Details
+                </h2>
+                <div className="space-y-4 max-h-[350px] overflow-y-auto pr-2 custom-scrollbar">
+                  {cameraTimeData.map((participant, index) => (
+                    <div 
+                      key={index} 
+                      className="p-4 bg-white rounded-xl border border-green-100 shadow-sm hover:shadow-md transition-shadow"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-4">
+                          <div className="p-2 bg-green-100 rounded-lg">
+                            <Users className="h-5 w-5 text-green-600" />
+                          </div>
+                          <p className="text-sm font-medium text-gray-900">{participant.name}</p>
+                          <p className="text-sm font-semibold text-green-600">
+                            {participant.cameraTime}s
                           </p>
                         </div>
                       </div>

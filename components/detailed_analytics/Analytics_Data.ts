@@ -7,6 +7,12 @@ interface ParsedAnalyticsRow {
     'mic end time': string;
 }
 
+interface ParsedCameraRow {
+    username: string;
+    'camera start time': string;
+    'camera end time': string;
+}
+
 const BUCKET_NAME = 'Polycomm';  // Updated bucket name to lowercase
 
 export async function fetchMeetingData(meetingId: string) {
@@ -38,21 +44,22 @@ export async function fetchMeetingData(meetingId: string) {
         console.log('Available files:', files);
 
         // Fetch files using Supabase storage
-        const meetingFilePath = `meetings/${meetingId}/camera_analytics_data.csv`;
+        const cameraAnalyticsFilePath = `meetings/${meetingId}/camera_analytics_data.csv`;
         const analyticsFilePath = `meetings/${meetingId}/analytics_data.csv`;
 
-        const { error: meetingFileError } = await supabase
+        const { data: cameraDataCsv, error: cameraFileError } = await supabase
             .storage
             .from(BUCKET_NAME)
-            .download(meetingFilePath);
+            .download(cameraAnalyticsFilePath);
 
-        if (meetingFileError) {
-            console.error('Error fetching meeting data file:', meetingFileError);
+        if (cameraFileError) {
+            console.error('Error fetching camera analytics data file:', cameraFileError);
             // If file doesn't exist, return meeting data only
             return {
                 meetingData,
                 processedData: {
                     speakingTimeData: [],
+                    cameraTimeData: [],
                     participationStats: []
                 }
             };
@@ -70,6 +77,7 @@ export async function fetchMeetingData(meetingId: string) {
                 meetingData,
                 processedData: {
                     speakingTimeData: [],
+                    cameraTimeData: [],
                     participationStats: []
                 }
             };
@@ -126,15 +134,68 @@ export async function fetchMeetingData(meetingId: string) {
             return acc;
         }, [] as typeof speakingTimeData);
 
+        // Convert Blob to text and parse camera data
+        const cameraDataText = await cameraDataCsv.text();
+        const parsedCameraData = Papa.parse(cameraDataText, {
+            header: true,
+            skipEmptyLines: true,
+            transformHeader: (header) => header.trim().toLowerCase(),
+        }).data as ParsedCameraRow[];
+
+        console.log('Raw parsed camera data:', parsedCameraData);
+
+        // Process camera time data
+        const cameraTimeData = parsedCameraData
+            .filter(row => row !== null && typeof row === 'object')
+            .map((row: ParsedCameraRow) => {
+                const name = row.username;
+                const startTime = new Date(row['camera start time']).getTime();
+                const endTime = new Date(row['camera end time']).getTime();
+                const cameraTime = isNaN(startTime) || isNaN(endTime) ? 0 : 
+                    Math.floor((endTime - startTime) / 1000); // Convert to seconds
+
+                console.log('Processing camera row:', {
+                    rawRow: row,
+                    processedName: name,
+                    processedTime: cameraTime,
+                    startTime: row['camera start time'],
+                    endTime: row['camera end time']
+                });
+
+                return {
+                    name: name || 'Unknown',
+                    cameraTime,
+                    participationScore: cameraTime > 0 ? 1 : 0
+                };
+            })
+            .filter(data => data.name !== 'Unknown' || data.cameraTime !== 0);
+
+        // Aggregate camera data
+        const aggregatedCameraData = cameraTimeData.reduce((acc, curr) => {
+            const existing = acc.find(item => item.name === curr.name);
+            if (existing) {
+                existing.cameraTime += curr.cameraTime;
+                existing.participationScore += curr.participationScore;
+            } else {
+                acc.push({ ...curr });
+            }
+            return acc;
+        }, [] as typeof cameraTimeData);
+
         // Process participation stats with aggregated data
         const participationStats = [
             { 
                 name: 'Speaking Time', 
                 value: aggregatedData.reduce((acc, curr) => acc + curr.speakingTime, 0) 
             },
+            {
+                name: 'Camera Time',
+                value: aggregatedCameraData.reduce((acc, curr) => acc + curr.cameraTime, 0)
+            },
             { 
-                name: 'Participation Score', 
-                value: aggregatedData.reduce((acc, curr) => acc + curr.participationScore, 0) 
+                name: 'Total Participation Score', 
+                value: aggregatedData.reduce((acc, curr) => acc + curr.participationScore, 0) +
+                       aggregatedCameraData.reduce((acc, curr) => acc + curr.participationScore, 0)
             },
         ];
 
@@ -142,6 +203,7 @@ export async function fetchMeetingData(meetingId: string) {
             meetingData,
             processedData: {
                 speakingTimeData: aggregatedData,
+                cameraTimeData: aggregatedCameraData,
                 participationStats
             }
         };
@@ -152,6 +214,7 @@ export async function fetchMeetingData(meetingId: string) {
             meetingData: null,
             processedData: {
                 speakingTimeData: [],
+                cameraTimeData: [],
                 participationStats: []
             }
         };
