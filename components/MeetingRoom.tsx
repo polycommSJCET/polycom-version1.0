@@ -29,7 +29,7 @@ import { cn } from '@/lib/utils';
 import { Button } from './ui/button';
 import { useUser } from "@clerk/nextjs";
 import { endCallNotification, endcalltrigger, logMicUsage, translateText, logCameraUsage } from './translateText';
-
+import { logPresenceToServer } from "./detailed_analytics/Analytics_Data"
 
 type CallLayoutType = 'grid' | 'speaker-left' | 'speaker-right';
 
@@ -252,9 +252,40 @@ const MeetingRoom = () => {
   const callingState = useCallCallingState();
   console.log("calling state",callingState)
 
+  // eslint-disable-next-line no-empty
   if (callingState==='left') {
     
   }
+
+  // Log presence data 
+const joinStateRef = useRef(false);
+const [previousCallingState, setPreviousCallingState] = useState<string | null>(null);
+
+useEffect(() => {
+  if (!callForAudio || !user || callingState === previousCallingState) return;
+
+  const logPresenceStatus = (status: 'joined' | 'left') => {
+    const timestamp = new Date().toISOString();
+    logPresenceToServer({
+      userName: user.fullName || 'Unknown User',
+      callId: callForAudio.id,
+      eventType: status,
+      eventTime: timestamp
+    });
+  };
+
+  if (callingState === CallingState.JOINED && !joinStateRef.current) {
+    logPresenceStatus('joined');
+    joinStateRef.current = true;
+  }
+
+  if (callingState === CallingState.LEFT && joinStateRef.current) {
+    logPresenceStatus('left');
+    joinStateRef.current = false;
+  }
+
+  setPreviousCallingState(callingState);
+}, [callingState, callForAudio, user, previousCallingState]);
 
   // Speech Recognition Logic
   const recognitionRef = useRef<null | any>(null);
