@@ -79,13 +79,14 @@ const MeetingRoom = () => {
 
   const handleCallEnd = () => {
     if (callEndedBy) {
+      const callEndTime = new Date().toISOString();
       const callStartTime = callStartTimeRef.current;
       const callDetails = {
         ...callEndedBy,
         callStartTime,
+        callEndTime,
       };
       endcalltrigger(callDetails, callForAudio?.id);
-      // Add your desired functionality here
     }
   };
 

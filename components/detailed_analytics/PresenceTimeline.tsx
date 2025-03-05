@@ -53,17 +53,12 @@ export function PresenceTimeline({ timelineData, presenceData }: PresenceTimelin
                     content={({ payload, label }) => {
                       if (payload && payload[0] && payload[0].payload) {
                         const interval = payload[0].payload;
-                        const startMinutes = Math.floor(interval.start / 60000);
-                        const endMinutes = Math.floor(interval.end / 60000);
-                        const duration = endMinutes - startMinutes;
+                        const duration = Math.floor((interval.end - interval.start) / 60000);
 
                         return (
                           <div className="bg-white p-2 shadow-lg rounded-lg border">
                             <p className="font-medium">{label}</p>
-                            <p>Status: {interval.status}</p>
-                            <p>Start: {startMinutes}m</p>
-                            <p>End: {endMinutes}m</p>
-                            <p>Duration: {duration}m</p>
+                            {/* <p>Duration: {duration}m</p> */}
                           </div>
                         );
                       }
