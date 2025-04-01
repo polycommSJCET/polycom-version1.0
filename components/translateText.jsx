@@ -56,7 +56,7 @@ export const translateText = async (text,username, language,meetingid) => {
     try {
       console.log("Sending call end notification...");
   
-      const response = await fetch(pyApiUrl + 'call-ended', {  // Ensure endpoint is correct
+      const response = await fetch(pyApiUrl + 'endcall', {  // Ensure endpoint is correct
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
