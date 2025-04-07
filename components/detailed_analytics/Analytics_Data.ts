@@ -1,7 +1,7 @@
 import { supabase } from '@/utils/supabase';
 import Papa from 'papaparse';
 
-const PYTHON_SERVER_URL = 'https://127.0.0.1:443';
+const PYTHON_SERVER_URL = 'https://172.16.101.2:443';
 
 interface ParsedAnalyticsRow {
     username: string;
