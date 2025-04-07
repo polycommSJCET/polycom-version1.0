@@ -163,7 +163,7 @@ const MinutesTemplatePage = ({ params }: { params: { id: string } }) => {
             <button
               className={`rounded-lg px-8 py-3 font-medium transition-all duration-300 ${
                 selectedTemplate && !isGenerating
-                  ? 'bg-blue-500 text-white hover:bg-blue-600 shadow-lg shadow-blue-500/30'
+                  ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/30 hover:bg-blue-600'
                   : 'cursor-not-allowed bg-gray-200 text-gray-400'
               }`}
               disabled={!selectedTemplate || isGenerating}
