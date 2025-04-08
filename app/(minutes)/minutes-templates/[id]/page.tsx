@@ -3,7 +3,8 @@
 import React, { useState } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { toast } from 'sonner';
-const pyApiUrl="https://172.16.101.2:443/"
+import { pyApiUrl } from '@/app/config';
+//const pyApiUrl="https://172.16.101.2:443/"
 
 const templates = [
   {

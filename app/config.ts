@@ -1,0 +1,1 @@
+export const pyApiUrl="https://192.168.198.62:443/"
